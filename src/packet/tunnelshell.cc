@@ -91,7 +91,7 @@ void TunnelShell::start_link( char ** const user_environment, UDPSocket & peer_s
                     string uid_wrapped_packet = string( (char *) &to_send, sizeof(struct wrapped_packet_header) ) + packet;
 
                     if ( egress_log ) {
-                        *egress_log << pretty_microseconds( timestamp_usecs() ) << " - " << to_send.uid << " - " << uid_wrapped_packet.length() + UDP_PACKET_HEADER_SIZE << endl;
+                        *egress_log << timestamp_usecs() << " - " << to_send.uid << " - " << uid_wrapped_packet.length() + UDP_PACKET_HEADER_SIZE << endl;
                     }
 
                     peer_socket.write( uid_wrapped_packet );
@@ -111,7 +111,7 @@ void TunnelShell::start_link( char ** const user_environment, UDPSocket & peer_s
                         if ( header_received.uid == (uint64_t) -1 ) {
                             cerr << "Got extra tunnelclient syn packet, responding again.." << endl;
 
-                            send_wrapper_only_datagram(peer_socket, (uint64_t) -2 );
+                            send_wrapper_only_datagram(peer_socket, (uint64_t) -2);//, *egress_log );
                             return ResultType::Continue;
                         } else if ( header_received.uid == (uint64_t) -2 ) {
                             // Got extra ack from server, ignore
@@ -123,7 +123,7 @@ void TunnelShell::start_link( char ** const user_environment, UDPSocket & peer_s
                     }
 
                     if ( ingress_log ) {
-                        *ingress_log << pretty_microseconds( timestamp_usecs() ) << " - " << header_received.uid << " - " << packet.length() + UDP_PACKET_HEADER_SIZE << endl;
+                        *ingress_log << timestamp_usecs() << " - " << header_received.uid << " - " << packet.length() + UDP_PACKET_HEADER_SIZE << endl;
                     }
 
                     tun.write( contents );

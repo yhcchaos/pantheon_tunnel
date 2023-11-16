@@ -8,6 +8,7 @@
 #include <memory>
 #include <iostream>
 #include <fstream>
+//#include <bitset>
 
 #include "tunnelshell_common.hh"
 #include "exception.hh"
@@ -46,8 +47,12 @@ int get_mtu( const string & if_name )
   return ifr.ifr_mtu;
 }
 
-void send_wrapper_only_datagram( FileDescriptor &connected_socket, const uint64_t uid ) {
+void send_wrapper_only_datagram( FileDescriptor &connected_socket, const uint64_t uid) {//, ofstream &log ) {
     const wrapped_packet_header to_send = { uid };
+    /*
+    std::bitset<64> binaryRepresentation(uid);
+    log << timestamp_usecs() << " Sending packet with uid " << std::setw(64) << std::setfill('0') << binaryRepresentation.to_string() << ", packet size: " << sizeof(to_send) << endl;
+    */
     connected_socket.write( std::string( (char *) &to_send, sizeof(to_send) ) );
 }
 
@@ -91,6 +96,6 @@ void initialize_logfile( std::unique_ptr<std::ofstream>& log, const std::string 
     }
     
     if ( log ) {
-        *log << "# " + pretty_command_line( argc, argv ) + " " + log_type + ": " << std::setprecision(3) << std::fixed << pretty_microseconds( initial_timestamp_usecs() ) << endl;
+        *log << "# " + pretty_command_line( argc, argv ) + " " + log_type + ": " << initial_timestamp_usecs() << endl;
     }
 }

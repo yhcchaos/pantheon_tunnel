@@ -11,7 +11,10 @@
 #include "tunnelshell_common.hh"
 #include "tunnelshell.hh"
 #include "timestamp.hh"
-
+/*
+#include <bitset>
+#include <iomanip>
+*/
 using namespace std;
 using namespace PollerShortNames;
 
@@ -128,7 +131,7 @@ int main( int argc, char *argv[] )
         int retry_num = 0;
         while (not got_ack) {
             try {
-                send_wrapper_only_datagram( server_socket, (uint64_t) -1 );
+                send_wrapper_only_datagram( server_socket, (uint64_t) -1);//, *egress_log );
             } catch ( const exception & e ) {
                 cerr << "Tunnelclient ignoring exception sending a syn: ";
                 print_exception( e );
@@ -138,8 +141,34 @@ int main( int argc, char *argv[] )
             ack_poll.add_action( Poller::Action( server_socket, Direction::In,
                         [&] () {
                         const string ack_packet = server_socket.read();
+                        /*
+                        *ingress_log << timestamp_usecs() << " Tunnelclient got data from server. data size: " <<  ack_packet.length() << std::endl;
+                        *ingress_log << "data: " << std::endl;
+                        for (size_t i = 1; i < ack_packet.size()+1; i++) {
+                            char c = ack_packet[i];
+                            std::bitset<8> binaryRepresentation(c);
+                            *ingress_log << std::setw(8) << std::setfill('0') << binaryRepresentation.to_string() << ' ';
+                            if(i % 4 == 0){
+                                *egress_log << endl;
+                            }
+                        }
+                        *ingress_log << endl;
+                        */
                         const wrapped_packet_header ack_header = *( (wrapped_packet_header *) ack_packet.data() );
                         if (ack_packet.length() == sizeof(wrapped_packet_header) && ack_header.uid == (uint64_t) -2) {
+                            /*
+                            *ingress_log << timestamp_usecs() << " Tunnelclient got ack from server. ack size: " <<  ack_packet.length() << std::endl;
+                            *ingress_log << "ack: " << std::endl;
+                            for (size_t i = 1; i < ack_packet.size()+1; i++) {
+                                char c = ack_packet[i];
+                                std::bitset<8> binaryRepresentation(c);
+                                *ingress_log << std::setw(8) << std::setfill('0') << binaryRepresentation.to_string() << ' ';
+                                if(i % 4 == 0){
+                                    std::cout << endl;
+                                }
+                            }
+                            *ingress_log << endl;
+                            */
                             got_ack = true;
                         }
                         return ResultType::Exit;

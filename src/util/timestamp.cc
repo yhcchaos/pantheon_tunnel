@@ -28,7 +28,7 @@ uint64_t initial_timestamp_usecs( void )
 
 uint64_t initial_timestamp( void )
 {
-    return usec_to_msec( initial_timestamp_usecs() );
+    return initial_timestamp_usecs();
 }
 
 uint64_t timestamp_usecs( void )
@@ -38,5 +38,5 @@ uint64_t timestamp_usecs( void )
 
 uint64_t timestamp( void )
 {
-    return usec_to_msec( timestamp_usecs() );
+    return timestamp_usecs();
 }

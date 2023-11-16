@@ -11,7 +11,8 @@
 #include "tunnelshell.hh"
 #include "interfaces.hh"
 #include "timestamp.hh"
-
+//#include <bitset>
+//#include <iomanip>
 using namespace std;
 using namespace PollerShortNames;
 
@@ -129,10 +130,35 @@ int main( int argc, char *argv[] )
         client_poll.add_action( Poller::Action( listening_socket, Direction::In,
                     [&] () {
                     const string client_packet = listening_socket.read();
+                    /*
+                    *ingress_log << timestamp_usecs() << " data: " << std::endl;
+                    for (size_t i = 1; i < client_packet.size()+1; i++) {
+                        char c = client_packet[i];
+                        std::bitset<8> binaryRepresentation(c);
+                        *ingress_log << std::setw(8) << std::setfill('0') << binaryRepresentation.to_string() << ' ';
+                        if(i % 4 == 0){
+                            *ingress_log << endl;
+                        }
+                    }
+                    *ingress_log << endl;
+                    */
                     const wrapped_packet_header client_header = *( (wrapped_packet_header *) client_packet.data() );
                     if (client_packet.length() == sizeof(wrapped_packet_header) && client_header.uid == (uint64_t) -1) {
                         cout << "Tunnelserver got connection from tunnelclient" << endl;
                         send_wrapper_only_datagram( listening_socket, (uint64_t) -2 );
+                        /*
+                        *ingress_log << "Tunnelserver got request from server. request size: " <<  client_packet.length() << std::endl;
+                            *ingress_log << "ack: " << std::endl;
+                            for (size_t i = 1; i < client_packet.size()+1; i++) {
+                                char c = client_packet[i];
+                                std::bitset<8> binaryRepresentation(c);
+                                *ingress_log << std::setw(8) << std::setfill('0') << binaryRepresentation.to_string() << ' ';
+                                if(i % 4 == 0){
+                                    *ingress_log << endl;
+                                }
+                            }
+                        */
+                        send_wrapper_only_datagram( listening_socket, (uint64_t) -2);// , *egress_log);
                         return ResultType::Exit;
                     } else {
                         cerr << "Tunnelserver received packet with unidentifiable contents" << endl;

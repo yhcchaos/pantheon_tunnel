@@ -1,3 +1,5 @@
+.vscode
+src/packet/output
 *.a
 *.o
 *.lo

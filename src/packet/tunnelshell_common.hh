@@ -24,7 +24,7 @@ void check_interface_for_binding( const std::string &prog_name, const std::strin
 
 int get_mtu( const std::string & if_name );
 
-void send_wrapper_only_datagram( FileDescriptor &connected_socket, const uint64_t uid );
+void send_wrapper_only_datagram( FileDescriptor &connected_socket, const uint64_t uid);//, ofstream &log );
 
 double pretty_microseconds( uint64_t usecs );
 
